@@ -13,5 +13,5 @@ tests now.  I still want to verify code coverage and run some benchmarks before
 it will be "done".
 
 I also fully acknowledge that this library isn't as "needed" for Go since Go ships
-with it's own https://go.dev/src/path/filepath/match.go which looks like it does
-pretty much everything this does.
+with it's own https://go.dev/src/path/filepath/match.go and https://pkg.go.dev/v.io/v23/glob 
+which looks like it operates pretty similar.
