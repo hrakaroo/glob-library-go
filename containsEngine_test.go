@@ -5,10 +5,8 @@ import (
 	"testing"
 )
 
-var containsEngineType = reflect.TypeOf(&containsEngine{})
-
 func matches(t *testing.T, typ reflect.Type, pattern string, match string, result bool) {
-	m, err := Compile(pattern, WithWildcardChar('%'), WithMatchOneChar('_'), WithCaseInsensitive(true))
+	m, err := Compile(pattern, WithWildcardChar('%'), WithMatchOneChar('_'), WithCaseInsensitive(true), WithHandleEscapes(true))
 	if err != nil {
 		t.Errorf("error was not nil: %v", err)
 	}
