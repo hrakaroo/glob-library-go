@@ -8,8 +8,8 @@ DRAFT
 
 This is a work in process.  I'm attempting to port my 
 https://github.com/hrakaroo/glob-library-java library
-to Go.  So far I've gotten all of the code to compile and I'm just pulling over the
-tests now.  I still want to verify code coverage and run some benchmarks before
+to Go.  So far I've gotten all of the code to compile and pulled over all tests.  
+I still want to verify code coverage and run some benchmarks before
 it will be "done".
 
 I also fully acknowledge that this library isn't as "needed" for Go since Go ships
