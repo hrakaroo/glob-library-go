@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const nullCharacter = rune(0)
+const NullCharacter = rune(0)
 
 // MatchingEngine is an interface which supports the Matches function
 type MatchingEngine interface {
@@ -44,7 +44,7 @@ func WithWildcardChar(wildcardChar rune) CompileOption {
 
 // WithoutWildcard disables wildcards completely
 func WithoutWildcard() CompileOption {
-	return &withWildcardChar{wildcardChar: nullCharacter}
+	return &withWildcardChar{wildcardChar: NullCharacter}
 }
 
 // Struct to hold the match one char option
@@ -63,7 +63,7 @@ func WithMatchOneChar(matchOneChar rune) CompileOption {
 
 // WithoutMatchOne disables match one completely
 func WithoutMatchOne() CompileOption {
-	return &withMatchOneChar{matchOneChar: nullCharacter}
+	return &withMatchOneChar{matchOneChar: NullCharacter}
 }
 
 // Struct to hold the case insensitive option
@@ -160,7 +160,7 @@ func Compile(globPattern string, options ...CompileOption) (MatchingEngine, erro
 		}
 
 		// Check if we have hit a wildcard character
-		if co.wildcardChar != nullCharacter && lowerC == co.wildcardChar {
+		if co.wildcardChar != NullCharacter && lowerC == co.wildcardChar {
 
 			// If we are in an escape then ignore the wildcard and let it fall through as a simple character
 			if !inEscape {
@@ -174,7 +174,7 @@ func Compile(globPattern string, options ...CompileOption) (MatchingEngine, erro
 				wildcard[index] = true
 				wildcardCount++
 			}
-		} else if co.matchOneChar != nullCharacter && lowerC == co.matchOneChar {
+		} else if co.matchOneChar != NullCharacter && lowerC == co.matchOneChar {
 			// As before, if we are in an escape then let the exactly one fall through as a regular character.
 			if !inEscape {
 				// Mark the location as being a matchOne
