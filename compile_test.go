@@ -48,6 +48,23 @@ func compile(t *testing.T, typ reflect.Type, pattern, lowerCase, upperCase strin
 	}
 }
 
+func matches(t *testing.T, typ reflect.Type, pattern string, match string, result bool) {
+	m, err := Compile(pattern, WithWildcardChar('%'), WithMatchOneChar('_'), WithCaseInsensitive(true), WithHandleEscapes(true))
+	if err != nil {
+		t.Errorf("error was not nil: %v", err)
+	}
+
+	mTyp := reflect.TypeOf(m)
+	if mTyp != typ {
+		t.Errorf("type does not match %v != %v", mTyp, typ)
+	}
+
+	lResult := m.Matches(match)
+	if lResult != result {
+		t.Errorf("result does not match expected %v != %v", lResult, result)
+	}
+}
+
 func TestSqlTest1(t *testing.T) {
 	compile(t, everythingEngineType, "%%%", "%", "%", 0b01, 0b00)
 }
