@@ -1,0 +1,650 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>glob-library-go: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/hrakaroo/glob-library-go/compiler.go (97.6%)</option>
+				
+				<option value="file1">github.com/hrakaroo/glob-library-go/engine.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package glob
+
+import (
+        "fmt"
+        "strconv"
+        "strings"
+)
+
+const NullCharacter = rune(0)
+
+// MatchingEngine is an interface which supports the Matches function
+type MatchingEngine interface {
+        // Matches returns true if the given string matches the compiled pattern
+        Matches(str string) bool
+}
+
+// Configurable options for the compile function
+type compileOption struct {
+        wildcardChar    rune
+        matchOneChar    rune
+        caseInsensitive bool
+        handleEscapes   bool
+}
+
+// CompileOption are options for the compile function
+type CompileOption interface {
+        // Apply applies the option to a compile option struct
+        apply(*compileOption)
+}
+
+// Struct to hold the wildcard char option
+type withWildcardChar struct {
+        wildcardChar rune
+}
+
+func (o *withWildcardChar) apply(co *compileOption) <span class="cov8" title="1">{
+        co.wildcardChar = o.wildcardChar
+}</span>
+
+// WithWildcardChar allows setting the wildcard char as an option
+func WithWildcardChar(wildcardChar rune) CompileOption <span class="cov8" title="1">{
+        return &amp;withWildcardChar{wildcardChar: wildcardChar}
+}</span>
+
+// WithoutWildcard disables wildcards completely
+func WithoutWildcard() CompileOption <span class="cov0" title="0">{
+        return &amp;withWildcardChar{wildcardChar: NullCharacter}
+}</span>
+
+// Struct to hold the match one char option
+type withMatchOneChar struct {
+        matchOneChar rune
+}
+
+func (o *withMatchOneChar) apply(co *compileOption) <span class="cov8" title="1">{
+        co.matchOneChar = o.matchOneChar
+}</span>
+
+// WithMatchOneChar allows setting the match one char as an option
+func WithMatchOneChar(matchOneChar rune) CompileOption <span class="cov8" title="1">{
+        return &amp;withMatchOneChar{matchOneChar: matchOneChar}
+}</span>
+
+// WithoutMatchOne disables match one completely
+func WithoutMatchOne() CompileOption <span class="cov0" title="0">{
+        return &amp;withMatchOneChar{matchOneChar: NullCharacter}
+}</span>
+
+// Struct to hold the case insensitive option
+type withCaseInsensitive struct {
+        caseInsensitive bool
+}
+
+func (o *withCaseInsensitive) apply(co *compileOption) <span class="cov8" title="1">{
+        co.caseInsensitive = o.caseInsensitive
+}</span>
+
+// WithCaseInsensitive allows setting the case insensitive as an option
+func WithCaseInsensitive(caseInsensitive bool) CompileOption <span class="cov8" title="1">{
+        return &amp;withCaseInsensitive{caseInsensitive: caseInsensitive}
+}</span>
+
+type withHandleEscapes struct {
+        handleEscapes bool
+}
+
+func (o *withHandleEscapes) apply(co *compileOption) <span class="cov8" title="1">{
+        co.handleEscapes = o.handleEscapes
+}</span>
+
+func WithHandleEscapes(handleEscapes bool) CompileOption <span class="cov8" title="1">{
+        return &amp;withHandleEscapes{handleEscapes: handleEscapes}
+}</span>
+
+// Compile compiles the glob pattern and returns a MatchingEngine or error if there was one
+func Compile(globPattern string, options ...CompileOption) (MatchingEngine, error) <span class="cov8" title="1">{
+
+        // Build our compile options with default values
+        co := compileOption{
+                wildcardChar:  rune('*'),
+                matchOneChar:  rune('?'),
+                handleEscapes: true,
+        }
+
+        // Process any options passed in on the compile options
+        for _, option := range options </span><span class="cov8" title="1">{
+                option.apply(&amp;co)
+        }</span>
+
+        // The 'raw' variables hold the pattern before we have processed it.  We just copy it here so we can directly
+        //  access the characters and deal with the case sensitivity in one place.  After this we don't have to
+        //  worry about case sensitivity again
+        <span class="cov8" title="1">lengthRaw := len(globPattern)
+        var lowerCaseRaw []rune
+        var upperCaseRaw []rune
+
+        if co.caseInsensitive </span><span class="cov8" title="1">{
+                // Case in-sensitive match so convert the pattern to upper and lower and assign it accordingly
+                lowerCaseRaw = []rune(strings.ToLower(globPattern))
+                upperCaseRaw = []rune(strings.ToUpper(globPattern))
+        }</span> else<span class="cov8" title="1"> {
+                // Case sensitive match so just get the backing character array and assign it to the upper and lower
+                lowerCaseRaw = []rune(globPattern)
+                upperCaseRaw = []rune(globPattern)
+        }</span>
+
+        // These will hold our strings after we process the escapes, multiple wildcards and anything else
+        <span class="cov8" title="1">lowerCase := make([]rune, lengthRaw)
+        upperCase := make([]rune, lengthRaw)
+
+        // Identifies the positions in the character array with wildcard characters
+        wildcard := make([]bool, lengthRaw)
+
+        // Identifies the positions in the character array match one characters
+        matchOne := make([]bool, lengthRaw)
+
+        // Flag to identify if we have processed an escape character.  If handleEscape is false then this
+        // will never be set to true
+        var inEscape bool
+
+        // Walk through the raw character arrays and copy them into the upperCase and lowerCase arrays.
+        //  While we walk through we will collapse multiple globs and handle escaped characters.
+
+        // Count the wildcards for shortcut handling later
+        wildcardCount := 0
+
+        // Index points to where we are in the lowerCase and upperCase arrays.
+        index := 0
+        for i := 0; i &lt; lengthRaw; i++ </span><span class="cov8" title="1">{
+
+                // Pull the characters/runes out
+                lowerC := lowerCaseRaw[i]
+                upperC := upperCaseRaw[i]
+
+                // Handle escaping
+                if co.handleEscapes &amp;&amp; lowerC == '\\' &amp;&amp; !inEscape </span><span class="cov8" title="1">{
+                        // Mark the flag and eat the escape
+                        inEscape = true
+                        continue</span>
+                }
+
+                // Check if we have hit a wildcard character
+                <span class="cov8" title="1">if co.wildcardChar != NullCharacter &amp;&amp; lowerC == co.wildcardChar </span><span class="cov8" title="1">{
+
+                        // If we are in an escape then ignore the wildcard and let it fall through as a simple character
+                        if !inEscape </span><span class="cov8" title="1">{
+                                // Check if this is a duplicate
+                                if index != 0 &amp;&amp; wildcard[index-1] </span><span class="cov8" title="1">{
+                                        // Yes, they have entered two wildcard patterns in a row so ignore the second wildcard
+                                        continue</span>
+                                }
+
+                                // We need to mark this location as being a wildcard
+                                <span class="cov8" title="1">wildcard[index] = true
+                                wildcardCount++</span>
+                        }
+                } else<span class="cov8" title="1"> if co.matchOneChar != NullCharacter &amp;&amp; lowerC == co.matchOneChar </span><span class="cov8" title="1">{
+                        // As before, if we are in an escape then let the exactly one fall through as a regular character.
+                        if !inEscape </span><span class="cov8" title="1">{
+                                // Mark the location as being a matchOne
+                                matchOne[index] = true
+                        }</span>
+                } else<span class="cov8" title="1"> if inEscape </span><span class="cov8" title="1">{
+                        switch lowerC </span>{
+                        case 'r':<span class="cov8" title="1">
+                                // Return
+                                lowerC = '\r'
+                                upperC = '\r'</span>
+                        case 'n':<span class="cov8" title="1">
+                                // New Line
+                                lowerC = '\n'
+                                upperC = '\n'</span>
+                        case 't':<span class="cov8" title="1">
+                                // Tab
+                                lowerC = '\t'
+                                upperC = '\t'</span>
+                        case '\\':<span class="cov8" title="1">
+                                // Backslash
+                                lowerC = '\\'
+                                upperC = '\\'</span>
+                        case 'u':<span class="cov8" title="1">
+                                // Unicode
+                                if i+4 &lt; lengthRaw </span><span class="cov8" title="1">{
+                                        s := string(lowerCaseRaw[i+1 : i+5])
+                                        // Try to convert it
+                                        u, err := strconv.ParseUint(s, 16, 64)
+                                        if err != nil </span><span class="cov8" title="1">{
+                                                return nil, fmt.Errorf("bad unicode character: %s", s)
+                                        }</span>
+                                        <span class="cov8" title="1">upperC = rune(u)
+                                        lowerC = rune(u)
+                                        // Move i ahead 4 for the characters we ate
+                                        i += 4</span>
+                                } else<span class="cov8" title="1"> {
+                                        return nil, fmt.Errorf("bad Unicode char at end of input")
+                                }</span>
+                        default:<span class="cov8" title="1">
+                                return nil, fmt.Errorf("unknown escape sequence : \\%U", lowerC)</span>
+                        }
+                }
+
+                // Copy the character over
+                <span class="cov8" title="1">lowerCase[index] = lowerC
+                upperCase[index] = upperC
+                index++
+
+                // Turn off escaping
+                inEscape = false</span>
+        }
+
+        // Index holds our length
+        <span class="cov8" title="1">length := index
+
+        // At this point we are done compiling the wildcard pattern into the lowerCase and upperCase arrays.
+        //  But we can inspect the resulting patterns and make some simple optimizations.
+
+        // If the pattern is empty ... they gave us an empty string so short cut it.
+        if length == 0 </span><span class="cov8" title="1">{
+                // specifically: ''
+                return emptyOnlyEngineInst, nil
+        }</span>
+
+        // If our pattern is just one character long, and its a wildcard, then this will match everything
+        //  so return the Match Everything Engine.
+        <span class="cov8" title="1">if length == 1 &amp;&amp; wildcard[0] </span><span class="cov8" title="1">{
+                // specifically: '%'
+                return everythingEngineInst, nil
+        }</span>
+
+        // If there are no wildcards then this is a simple equal to engine
+        <span class="cov8" title="1">if wildcardCount == 0 </span><span class="cov8" title="1">{
+                // ex: 'foo'
+                return &amp;equalToEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+        }</span>
+
+        // If there is only one wildcard and it is at either the start or end then return
+        //  an EndsWith or StartsWith engine accordingly
+        <span class="cov8" title="1">if wildcardCount == 1 </span><span class="cov8" title="1">{
+                if wildcard[0] </span><span class="cov8" title="1">{
+                        // ex: '%foo'
+                        return &amp;endsWithEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+                }</span>
+                <span class="cov8" title="1">if wildcard[length-1] </span><span class="cov8" title="1">{
+                        // ex: 'foo%'
+                        return &amp;startsWithEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+
+                }</span>
+        }
+
+        // If there are two wildcards and they are at the start AND end then this is a contains
+        <span class="cov8" title="1">if wildcardCount == 2 &amp;&amp; wildcard[0] &amp;&amp; wildcard[length-1] </span><span class="cov8" title="1">{
+                // ex: '%foo%'
+                return &amp;containsEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+        }</span>
+
+        // No other shortcuts so fall back to the glob engine
+        <span class="cov8" title="1">return &amp;globEngine{lowerCase: lowerCase, upperCase: upperCase, wildcard: wildcard, matchOne: matchOne, length: length}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package glob
+
+const startingStackSize = 16
+
+// Used to identify when there is no save point to jump back to
+const noSavePoint = -1
+
+var emptyOnlyEngineInst = &amp;emptyOnlyEngine{}
+var everythingEngineInst = &amp;everythingEngine{}
+
+// emptyOnlyEngine is one which just matches the empty string
+type emptyOnlyEngine struct {
+}
+
+func (e *emptyOnlyEngine) Matches(str string) bool <span class="cov8" title="1">{
+        return len(str) == 0
+}</span>
+
+// everythingEngine matches everything
+type everythingEngine struct {
+}
+
+func (e *everythingEngine) Matches(str string) bool <span class="cov8" title="1">{
+        return true
+}</span>
+
+// EqualToEngine is an equality check
+type equalToEngine struct {
+        lowerCase []rune
+        upperCase []rune
+        matchOne  []bool
+        length    int
+}
+
+func (e *equalToEngine) Matches(str string) bool <span class="cov8" title="1">{
+
+        strRune := []rune(str)
+
+        // Test if the lengths are the same and shortcut if not
+        if e.length != len(strRune) </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        // Walk down the two character arrays and verify the characters are equal.
+        <span class="cov8" title="1">index := 0
+        for </span><span class="cov8" title="1">{
+                // If we reach the end the they must be equal
+                if index == e.length </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+
+                <span class="cov8" title="1">if !e.matchOne[index] &amp;&amp; strRune[index] != e.lowerCase[index] &amp;&amp; strRune[index] != e.upperCase[index] </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+                <span class="cov8" title="1">index++</span>
+        }
+}
+
+type endsWithEngine struct {
+        lowerCase []rune
+        upperCase []rune
+        matchOne  []bool
+        length    int
+}
+
+func (e *endsWithEngine) Matches(str string) bool <span class="cov8" title="1">{
+
+        strRune := []rune(str)
+
+        // The input string must be at least as long as the glob pattern -1 (for the first wildcard)
+        if len(str) &lt; e.length-1 </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">charsIndex := len(strRune) - 1
+
+        for patternIndex := e.length - 1; patternIndex &gt; 0; patternIndex-- </span><span class="cov8" title="1">{
+                if !e.matchOne[patternIndex] &amp;&amp; strRune[charsIndex] != e.lowerCase[patternIndex] &amp;&amp;
+                        strRune[charsIndex] != e.upperCase[patternIndex] </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+                <span class="cov8" title="1">charsIndex--</span>
+        }
+        <span class="cov8" title="1">return true</span>
+}
+
+type startsWithEngine struct {
+        lowerCase []rune
+        upperCase []rune
+        matchOne  []bool
+        length    int
+}
+
+func (e *startsWithEngine) Matches(str string) bool <span class="cov8" title="1">{
+
+        strRune := []rune(str)
+
+        // The input string must be at least as long as the glob pattern -1 (for the final wildcard)
+        if len(strRune) &lt; e.length-1 </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        // Run down through the pattern and compare them.  If we get to the end of our pattern then have matched.
+        <span class="cov8" title="1">for index := 0; index &lt; e.length-1; index++ </span><span class="cov8" title="1">{
+                if !e.matchOne[index] &amp;&amp; strRune[index] != e.lowerCase[index] &amp;&amp; strRune[index] != e.upperCase[index] </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+        }
+        <span class="cov8" title="1">return true</span>
+}
+
+type containsEngine struct {
+        lowerCase []rune
+        upperCase []rune
+        matchOne  []bool
+        length    int
+}
+
+func (e *containsEngine) Matches(str string) bool <span class="cov8" title="1">{
+
+        strRune := []rune(str)
+
+        // The input string must be at least as long as the glob pattern - 2 (for the first and last wildcard)
+        if len(strRune) &lt; e.length-2 </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">charsIndex := 0
+        patternIndex := 1 // Skip the starting wildcard
+        charsSavePoint := noSavePoint
+
+        // The only counter we really care about is the one walking the pattern.  Once the pattern index gets
+        //  to the end of its pattern (-1) we are done.  The chars index is just along for the ride.
+
+        // The difficulty in using a for loop here is that the patternIndex and charsIndex can both be reset
+        //  which means we would have to reset them at value-1 to offset the for loop incrementing them.
+
+        for </span><span class="cov8" title="1">{
+                if patternIndex == e.length-1 </span><span class="cov8" title="1">{
+                        // We got to the end of our pattern (-1 for the final wildcard char)
+                        return true
+                }</span>
+
+                // Check if we are not at the end of our string and if the character is a matchOne or matches
+                <span class="cov8" title="1">if charsIndex != len(strRune) &amp;&amp;
+                        (e.matchOne[patternIndex] ||
+                                strRune[charsIndex] == e.lowerCase[patternIndex] ||
+                                strRune[charsIndex] == e.upperCase[patternIndex]) </span><span class="cov8" title="1">{
+
+                        // At this point the input string and the pattern are matching, but this may be a false
+                        // match in the string (meaning it starts with the pattern but is not a full pattern)
+                        // Consider string = "my dog fred my dog spot" and the pattern "%my dog spot%"
+                        // This pattern is going to *start* matching at charIndex 0, but its a false match since
+                        // the two will diverge before we get to the end of the pattern.
+                        // Therefore, if we are not already waking down a branch we need to save a branch point
+                        // that assumes its a false match.
+
+                        if charsSavePoint == noSavePoint </span><span class="cov8" title="1">{
+                                charsSavePoint = charsIndex + 1
+                        }</span>
+                        // Keep walking forward
+                        <span class="cov8" title="1">patternIndex++
+                        charsIndex++</span>
+                } else<span class="cov8" title="1"> if charsIndex != len(strRune) &amp;&amp; charsSavePoint == noSavePoint </span><span class="cov8" title="1">{
+
+                        // charsSavePoint == noSavePoint means we are still pointing at the wildcard and
+                        //  have not yet matched, so as long as we are not at the end of our string, keep walking
+                        charsIndex++
+                }</span> else<span class="cov8" title="1"> if charsSavePoint != noSavePoint </span><span class="cov8" title="1">{
+
+                        // Our chars index has reached the end of the input string before our pattern index reached
+                        //  the end of the pattern. Normally we would be dead here, but we have a save point so
+                        //  reset the charsIndex to the save point (which has already been moved forward), reset
+                        //  the pattern index to the start of the pattern and remove our save point.
+                        charsIndex = charsSavePoint
+                        patternIndex = 1
+                        charsSavePoint = noSavePoint
+                }</span> else<span class="cov8" title="1"> {
+                        // We failed and we have no alternative branch to try
+                        return false
+                }</span>
+        }
+}
+
+type globEngine struct {
+        lowerCase []rune
+        upperCase []rune
+        wildcard  []bool
+        matchOne  []bool
+        length    int
+}
+
+func (e *globEngine) Matches(str string) bool <span class="cov8" title="1">{
+
+        strRune := []rune(str)
+
+        // We use a stack instead of doing recursion.
+        //  We could move this stack declaration to a class field and doing so gains us about a 5% speed
+        //  improvement.  However, it would also remove the thread safety of this class so for the time
+        //  being I'm going to leave it here.
+        stack := make([]int, startingStackSize)
+        stackIndex := 0
+
+        // Our two indexes, one to walk down the input string and the other to walk down the pattern
+        charsIndex := 0
+        patternIndex := 0
+
+        for </span><span class="cov8" title="1">{
+                // If we are not at the end of our pattern and we have hit a wildcard
+                if patternIndex != e.length &amp;&amp; e.wildcard[patternIndex] </span><span class="cov8" title="1">{
+
+                        // If we are not at the end of our input string
+                        if charsIndex != len(str) </span><span class="cov8" title="1">{
+                                // Check our stack is big enough.
+                                if stackIndex == cap(stack) </span><span class="cov8" title="1">{
+                                        tmp := make([]int, cap(stack)*2)
+                                        copy(tmp, stack)
+                                        stack = tmp
+                                }</span>
+                                // Add a path branch where we try walking the char index forward
+                                <span class="cov8" title="1">stack[stackIndex] = patternIndex
+                                stackIndex++
+                                stack[stackIndex] = charsIndex + 1
+                                stackIndex++</span>
+                        }
+
+                        // Walk the wildcard index forward (non-greedy)
+                        <span class="cov8" title="1">patternIndex++</span>
+                }
+
+                // If we reach the end of our character array and
+                //  we are at the end of the wildcard then we are are successful
+                <span class="cov8" title="1">if patternIndex == e.length &amp;&amp; charsIndex == len(strRune) </span><span class="cov8" title="1">{
+                        // Boom!
+                        return true
+                }</span>
+
+                // This path fails if we are either at the end of the character string, or the pattern string as we
+                //  can not be at the end of both of them at the same time since that would have been caught by the
+                //  above conditional.
+                // If we are not at the end of either string then we fail if the characters match or if we are on a
+                //  matchOne (meaning we match any single character.)
+                <span class="cov8" title="1">if charsIndex == len(strRune) || patternIndex == e.length ||
+                        (!e.matchOne[patternIndex] &amp;&amp; strRune[charsIndex] != e.lowerCase[patternIndex] &amp;&amp; strRune[charsIndex] != e.upperCase[patternIndex]) </span><span class="cov8" title="1">{
+
+                        // This branch has failed to match, so check if we have a different branch we can try
+                        if stackIndex != 0 </span><span class="cov8" title="1">{
+                                // Yes, so reset our indexes and loop.
+                                stackIndex--
+                                charsIndex = stack[stackIndex]
+                                stackIndex--
+
+                                patternIndex = stack[stackIndex]
+                        }</span> else<span class="cov8" title="1"> {
+                                // No, we have exhausted all available branches so this pattern fails to branch.
+                                return false
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        // We get here if we did not fail in any of those above conditions and we should continue
+                        //  walking down both strings.
+                        patternIndex++
+                        charsIndex++
+                }</span>
+        }
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

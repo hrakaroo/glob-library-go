@@ -6,7 +6,8 @@ import (
 )
 
 // Technically this should probably be called compiler_test, but I'm trying to keep the
-// 1:1 parity with the glob-library-java library
+// 1:1 parity with the glob-library-java library as it will make back porting any changes
+// I do make in the Java one (or vice versa) much easier.
 
 var containsEngineType = reflect.TypeOf(&containsEngine{})
 var everythingEngineType = reflect.TypeOf(&everythingEngine{})
