@@ -14,7 +14,9 @@ I also fully acknowledge that this library isn't as "needed" for Go since Go shi
 with it's own https://go.dev/src/path/filepath/match.go and https://pkg.go.dev/v.io/v23/glob 
 which looks like it operates pretty similar.
 
-v0.1.0-alpha
+## Releases
+
+### v0.1.0-alpha
 
 So I've created a v0.1.0-alpha release of this library. To use it just put
 
