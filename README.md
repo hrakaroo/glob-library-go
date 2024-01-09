@@ -27,7 +27,8 @@ in your `go.mod` file and then you can import the library with
 in your code.  So far it seems to work pretty well.  I still need to build the
 benchmarks, but otherwise my simple test worked
 
-   func main() {
+```
+func main() {
 	fmt.Println("hello")
 	m, err := glob.Compile("*foo*")
 	if err != nil {
@@ -35,4 +36,5 @@ benchmarks, but otherwise my simple test worked
 	}
 
 	fmt.Println(m.Matches("bogfoo"))
-   }
+}
+```
