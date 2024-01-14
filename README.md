@@ -25,16 +25,15 @@ go tool cover -html=coverage.out -o coverage.html
 Files
 ```
 100.0% for engine.go
-97.6% for compiler.go
+100.0% for compiler.go
 ```
 
 Overall
 ```
-98.7% of statements
+100.0% of statements
 ```
 
-The coverage missing in compiler.go is mostly around using the option builders.  I'll add more tests in shortly
-to get this to 100%
+Added some compile option tests and the library is now at 100% code test coverage.
 
 ## Releases
 

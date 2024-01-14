@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/hrakaroo/glob-library-go/compiler.go (97.6%)</option>
+				<option value="file0">github.com/hrakaroo/glob-library-go/compiler.go (100.0%)</option>
 				
 				<option value="file1">github.com/hrakaroo/glob-library-go/engine.go (100.0%)</option>
 				
@@ -116,7 +116,7 @@ func WithWildcardChar(wildcardChar rune) CompileOption <span class="cov8" title=
 }</span>
 
 // WithoutWildcard disables wildcards completely
-func WithoutWildcard() CompileOption <span class="cov0" title="0">{
+func WithoutWildcard() CompileOption <span class="cov8" title="1">{
         return &amp;withWildcardChar{wildcardChar: NullCharacter}
 }</span>
 
@@ -135,7 +135,7 @@ func WithMatchOneChar(matchOneChar rune) CompileOption <span class="cov8" title=
 }</span>
 
 // WithoutMatchOne disables match one completely
-func WithoutMatchOne() CompileOption <span class="cov0" title="0">{
+func WithoutMatchOne() CompileOption <span class="cov8" title="1">{
         return &amp;withMatchOneChar{matchOneChar: NullCharacter}
 }</span>
 
