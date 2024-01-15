@@ -72,19 +72,16 @@ goos: darwin
 goarch: amd64
 pkg: github.com/hrakaroo/glob-library-go
 cpu: Intel(R) Core(TM) i7-7660U CPU @ 2.50GHz
-BenchmarkGlobWords-4                	      32	  47255998 ns/op	     480 B/op	      20 allocs/op
-BenchmarkGreedyRegexWords-4         	       6	 171364844 ns/op	    9574 B/op	      92 allocs/op
-BenchmarkNonGreedyRegexWords-4      	       6	 168362782 ns/op	    9574 B/op	      92 allocs/op
-BenchmarkGlobLogLines-4             	      15	  73967985 ns/op	58958800 B/op	   59546 allocs/op
-BenchmarkGreedyRegexLogLines-4      	       4	 299777088 ns/op	  108288 B/op	      95 allocs/op
-BenchmarkNonGreedyRegexLogLines-4   	       3	 392486405 ns/op	  141218 B/op	      96 allocs/op
+BenchmarkGlobWords-4                	      43	  28000556 ns/op	     528 B/op	      26 allocs/op
+BenchmarkGreedyRegexWords-4         	       7	 168131805 ns/op	   14853 B/op	      92 allocs/op
+BenchmarkNonGreedyRegexWords-4      	       6	 176012549 ns/op	    9574 B/op	      92 allocs/op
+BenchmarkGlobLogLines-4             	      21	  54344059 ns/op	     528 B/op	      26 allocs/op
+BenchmarkGreedyRegexLogLines-4      	       4	 297334020 ns/op	  108286 B/op	      95 allocs/op
+BenchmarkNonGreedyRegexLogLines-4   	       4	 304755895 ns/op	    9618 B/op	      92 allocs/op
 PASS
-ok  	github.com/hrakaroo/glob-library-go	10.270s
+ok  	github.com/hrakaroo/glob-library-go	9.912s
 ```
 
 I have not spent a huge amount of time on this so I may not be running the benchmark entirely correct.
 That said, for both `words` and `logLines` the glob library is considerably faster than both the greedy 
-and non greedy regex runs.  However, for the log lines run the the glob library has a significantly
-larger number of allocations ... which I find bothersome.
-
-I'm going to poke around a bit and see if I can figure out what is causing this.
+and non greedy regex runs and have the fewest number of allocations.

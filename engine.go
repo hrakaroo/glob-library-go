@@ -26,18 +26,16 @@ func (e *everythingEngine) Matches(str string) bool {
 
 // EqualToEngine is an equality check
 type equalToEngine struct {
-	lowerCase []rune
-	upperCase []rune
+	lowerCase string
+	upperCase string
 	matchOne  []bool
 	length    int
 }
 
 func (e *equalToEngine) Matches(str string) bool {
 
-	strRune := []rune(str)
-
 	// Test if the lengths are the same and shortcut if not
-	if e.length != len(strRune) {
+	if e.length != len(str) {
 		return false
 	}
 
@@ -49,7 +47,7 @@ func (e *equalToEngine) Matches(str string) bool {
 			return true
 		}
 
-		if !e.matchOne[index] && strRune[index] != e.lowerCase[index] && strRune[index] != e.upperCase[index] {
+		if !e.matchOne[index] && str[index] != e.lowerCase[index] && str[index] != e.upperCase[index] {
 			return false
 		}
 		index++
@@ -57,26 +55,24 @@ func (e *equalToEngine) Matches(str string) bool {
 }
 
 type endsWithEngine struct {
-	lowerCase []rune
-	upperCase []rune
+	lowerCase string
+	upperCase string
 	matchOne  []bool
 	length    int
 }
 
 func (e *endsWithEngine) Matches(str string) bool {
 
-	strRune := []rune(str)
-
 	// The input string must be at least as long as the glob pattern -1 (for the first wildcard)
 	if len(str) < e.length-1 {
 		return false
 	}
 
-	charsIndex := len(strRune) - 1
+	charsIndex := len(str) - 1
 
 	for patternIndex := e.length - 1; patternIndex > 0; patternIndex-- {
-		if !e.matchOne[patternIndex] && strRune[charsIndex] != e.lowerCase[patternIndex] &&
-			strRune[charsIndex] != e.upperCase[patternIndex] {
+		if !e.matchOne[patternIndex] && str[charsIndex] != e.lowerCase[patternIndex] &&
+			str[charsIndex] != e.upperCase[patternIndex] {
 			return false
 		}
 		charsIndex--
@@ -85,24 +81,22 @@ func (e *endsWithEngine) Matches(str string) bool {
 }
 
 type startsWithEngine struct {
-	lowerCase []rune
-	upperCase []rune
+	lowerCase string
+	upperCase string
 	matchOne  []bool
 	length    int
 }
 
 func (e *startsWithEngine) Matches(str string) bool {
 
-	strRune := []rune(str)
-
 	// The input string must be at least as long as the glob pattern -1 (for the final wildcard)
-	if len(strRune) < e.length-1 {
+	if len(str) < e.length-1 {
 		return false
 	}
 
 	// Run down through the pattern and compare them.  If we get to the end of our pattern then have matched.
 	for index := 0; index < e.length-1; index++ {
-		if !e.matchOne[index] && strRune[index] != e.lowerCase[index] && strRune[index] != e.upperCase[index] {
+		if !e.matchOne[index] && str[index] != e.lowerCase[index] && str[index] != e.upperCase[index] {
 			return false
 		}
 	}
@@ -110,18 +104,16 @@ func (e *startsWithEngine) Matches(str string) bool {
 }
 
 type containsEngine struct {
-	lowerCase []rune
-	upperCase []rune
+	lowerCase string
+	upperCase string
 	matchOne  []bool
 	length    int
 }
 
 func (e *containsEngine) Matches(str string) bool {
 
-	strRune := []rune(str)
-
 	// The input string must be at least as long as the glob pattern - 2 (for the first and last wildcard)
-	if len(strRune) < e.length-2 {
+	if len(str) < e.length-2 {
 		return false
 	}
 
@@ -142,10 +134,10 @@ func (e *containsEngine) Matches(str string) bool {
 		}
 
 		// Check if we are not at the end of our string and if the character is a matchOne or matches
-		if charsIndex != len(strRune) &&
+		if charsIndex != len(str) &&
 			(e.matchOne[patternIndex] ||
-				strRune[charsIndex] == e.lowerCase[patternIndex] ||
-				strRune[charsIndex] == e.upperCase[patternIndex]) {
+				str[charsIndex] == e.lowerCase[patternIndex] ||
+				str[charsIndex] == e.upperCase[patternIndex]) {
 
 			// At this point the input string and the pattern are matching, but this may be a false
 			// match in the string (meaning it starts with the pattern but is not a full pattern)
@@ -161,7 +153,7 @@ func (e *containsEngine) Matches(str string) bool {
 			// Keep walking forward
 			patternIndex++
 			charsIndex++
-		} else if charsIndex != len(strRune) && charsSavePoint == noSavePoint {
+		} else if charsIndex != len(str) && charsSavePoint == noSavePoint {
 
 			// charsSavePoint == noSavePoint means we are still pointing at the wildcard and
 			//  have not yet matched, so as long as we are not at the end of our string, keep walking
@@ -183,16 +175,14 @@ func (e *containsEngine) Matches(str string) bool {
 }
 
 type globEngine struct {
-	lowerCase []rune
-	upperCase []rune
+	lowerCase string
+	upperCase string
 	wildcard  []bool
 	matchOne  []bool
 	length    int
 }
 
 func (e *globEngine) Matches(str string) bool {
-
-	strRune := []rune(str)
 
 	// We use a stack instead of doing recursion.
 	//  We could move this stack declaration to a class field and doing so gains us about a 5% speed
@@ -230,7 +220,7 @@ func (e *globEngine) Matches(str string) bool {
 
 		// If we reach the end of our character array and
 		//  we are at the end of the wildcard then we are are successful
-		if patternIndex == e.length && charsIndex == len(strRune) {
+		if patternIndex == e.length && charsIndex == len(str) {
 			// Boom!
 			return true
 		}
@@ -240,8 +230,8 @@ func (e *globEngine) Matches(str string) bool {
 		//  above conditional.
 		// If we are not at the end of either string then we fail if the characters match or if we are on a
 		//  matchOne (meaning we match any single character.)
-		if charsIndex == len(strRune) || patternIndex == e.length ||
-			(!e.matchOne[patternIndex] && strRune[charsIndex] != e.lowerCase[patternIndex] && strRune[charsIndex] != e.upperCase[patternIndex]) {
+		if charsIndex == len(str) || patternIndex == e.length ||
+			(!e.matchOne[patternIndex] && str[charsIndex] != e.lowerCase[patternIndex] && str[charsIndex] != e.upperCase[patternIndex]) {
 
 			// This branch has failed to match, so check if we have a different branch we can try
 			if stackIndex != 0 {

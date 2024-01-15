@@ -247,10 +247,13 @@ func Compile(globPattern string, options ...CompileOption) (MatchingEngine, erro
 		return everythingEngineInst, nil
 	}
 
+	lowerCaseStr := string(lowerCase)
+	upperCaseStr := string(upperCase)
+
 	// If there are no wildcards then this is a simple equal to engine
 	if wildcardCount == 0 {
 		// ex: 'foo'
-		return &equalToEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+		return &equalToEngine{lowerCase: lowerCaseStr, upperCase: upperCaseStr, matchOne: matchOne, length: length}, nil
 	}
 
 	// If there is only one wildcard and it is at either the start or end then return
@@ -258,11 +261,11 @@ func Compile(globPattern string, options ...CompileOption) (MatchingEngine, erro
 	if wildcardCount == 1 {
 		if wildcard[0] {
 			// ex: '%foo'
-			return &endsWithEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+			return &endsWithEngine{lowerCase: lowerCaseStr, upperCase: upperCaseStr, matchOne: matchOne, length: length}, nil
 		}
 		if wildcard[length-1] {
 			// ex: 'foo%'
-			return &startsWithEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+			return &startsWithEngine{lowerCase: lowerCaseStr, upperCase: upperCaseStr, matchOne: matchOne, length: length}, nil
 
 		}
 	}
@@ -270,9 +273,9 @@ func Compile(globPattern string, options ...CompileOption) (MatchingEngine, erro
 	// If there are two wildcards and they are at the start AND end then this is a contains
 	if wildcardCount == 2 && wildcard[0] && wildcard[length-1] {
 		// ex: '%foo%'
-		return &containsEngine{lowerCase: lowerCase, upperCase: upperCase, matchOne: matchOne, length: length}, nil
+		return &containsEngine{lowerCase: lowerCaseStr, upperCase: upperCaseStr, matchOne: matchOne, length: length}, nil
 	}
 
 	// No other shortcuts so fall back to the glob engine
-	return &globEngine{lowerCase: lowerCase, upperCase: upperCase, wildcard: wildcard, matchOne: matchOne, length: length}, nil
+	return &globEngine{lowerCase: lowerCaseStr, upperCase: string(upperCase), wildcard: wildcard, matchOne: matchOne, length: length}, nil
 }
