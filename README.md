@@ -82,9 +82,9 @@ PASS
 ok  	github.com/hrakaroo/glob-library-go	10.270s
 ```
 
-I have not spent a huge amount of time on this so I may not be running the benchmark entirely correctly.
-That said, for both words and log lines the glob library is considerably faster than both the greedy 
-and non greedy regex runs.  That said, for the log lines run the the glob library has a significantly
-larger number of bytes and allocations ... which I find bothersome.
+I have not spent a huge amount of time on this so I may not be running the benchmark entirely correct.
+That said, for both `words` and `logLines` the glob library is considerably faster than both the greedy 
+and non greedy regex runs.  However, for the log lines run the the glob library has a significantly
+larger number of allocations ... which I find bothersome.
 
 I'm going to poke around a bit and see if I can figure out what is causing this.
