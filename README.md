@@ -41,13 +41,12 @@ To use it add
 
 `require github.com/hrakaroo/glob-library-go v0.2.1-beta`
 
-in your `go.mod` file and then import the library with
-
-`import glob "github.com/hrakaroo/glob-library-go"`
-
-in your code.  For my simple test this worked pretty well:
+in your `go.mod` file and then import the library in your code.  
+For my simple test this worked pretty well:
 
 ```
+import glob "github.com/hrakaroo/glob-library-go"
+
 func main() {
 	fmt.Println("hello")
 	m, err := glob.Compile("*foo*")
