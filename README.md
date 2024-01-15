@@ -4,14 +4,17 @@ Glob style pattern matcher for strings in Go.
 
 ## Why
 
-This is a port of my https://github.com/hrakaroo/glob-library-java library
-to Go.  All of the code (including tests) have been pulled over and converted. 
-Everything compiles and all tests pass. I still want to run some benchmarks 
-before calling it "done".
+Port of the https://github.com/hrakaroo/glob-library-java library
+to Go.  All code (including tests) have been pulled over and converted. 
+Everything compiles and all tests pass. Main benchmark for GlobEngine is is done.
+Still have a couple of additional benchmarks to run before calling it officially 
+done, but it's pretty close.
 
-I also acknowledge that this library isn't as _needed_ for Go since Go ships
-with it's own https://go.dev/src/path/filepath/match.go and https://pkg.go.dev/v.io/v23/glob 
-which looks to operate pretty similar.
+### Related work
+
+There are already several glob implementations (https://go.dev/src/path/filepath/match.go 
+and https://pkg.go.dev/v.io/v23/glob among others), but most seem to be focused
+on file paths and treat slash as a hard separator.
 
 ## Code Coverage
 
