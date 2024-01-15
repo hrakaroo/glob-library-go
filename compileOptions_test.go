@@ -45,3 +45,21 @@ func TestWithMatchOne(t *testing.T) {
 		t.Error("MatchOne was not set")
 	}
 }
+
+func TestWithCaseSensitive(t *testing.T) {
+	optionsTrue := WithCaseInsensitive(true)
+	optionsFalse := WithCaseInsensitive(false)
+
+	co := compileOption{}
+	optionsTrue.apply(&co)
+
+	if !co.caseInsensitive {
+		t.Error("Case Insensitive was not true")
+	}
+
+	optionsFalse.apply(&co)
+
+	if co.caseInsensitive {
+		t.Error("Case Insensitive is true")
+	}
+}

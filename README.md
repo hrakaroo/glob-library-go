@@ -60,3 +60,31 @@ func main() {
 	fmt.Println(m.Matches("bogfoo"))
 }
 ```
+
+## Performance
+
+For both the globWords and globLogLines benchmarks the glob pattern has been written 
+specifically to prevent the Glob library from using an optimization.
+
+```
+> go test -bench . -benchmem
+goos: darwin
+goarch: amd64
+pkg: github.com/hrakaroo/glob-library-go
+cpu: Intel(R) Core(TM) i7-7660U CPU @ 2.50GHz
+BenchmarkGlobWords-4                	      32	  47255998 ns/op	     480 B/op	      20 allocs/op
+BenchmarkGreedyRegexWords-4         	       6	 171364844 ns/op	    9574 B/op	      92 allocs/op
+BenchmarkNonGreedyRegexWords-4      	       6	 168362782 ns/op	    9574 B/op	      92 allocs/op
+BenchmarkGlobLogLines-4             	      15	  73967985 ns/op	58958800 B/op	   59546 allocs/op
+BenchmarkGreedyRegexLogLines-4      	       4	 299777088 ns/op	  108288 B/op	      95 allocs/op
+BenchmarkNonGreedyRegexLogLines-4   	       3	 392486405 ns/op	  141218 B/op	      96 allocs/op
+PASS
+ok  	github.com/hrakaroo/glob-library-go	10.270s
+```
+
+I have not spent a huge amount of time on this so I may not be running the benchmark entirely correctly.
+That said, for both words and log lines the glob library is considerably faster than both the greedy 
+and non greedy regex runs.  That said, for the log lines run the the glob library has a significantly
+larger number of bytes and allocations ... which I find bothersome.
+
+I'm going to poke around a bit and see if I can figure out what is causing this.
