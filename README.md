@@ -37,11 +37,9 @@ Added some compile option tests and the library is now at 100% code test coverag
 
 ## Releases
 
-### v0.1.0-alpha
+To use it add
 
-First tagged version of this library. To use it add
-
-`require github.com/hrakaroo/glob-library-go v0.1.0-alpha`
+`require github.com/hrakaroo/glob-library-go v0.2.1-beta`
 
 in your `go.mod` file and then import the library with
 
@@ -60,6 +58,15 @@ func main() {
 	fmt.Println(m.Matches("bogfoo"))
 }
 ```
+
+### v0.1.0-alpha
+
+First tagged version of this library.
+
+### v0.2.1-beta
+
+Fixed the alloc issue with this version.  I may want to add a couple more 
+benchmark test, but this is pretty close to being ready for production.
 
 ## Performance
 
