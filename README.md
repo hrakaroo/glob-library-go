@@ -115,9 +115,9 @@ the greedy and non greedy regex runs and have the fewest number of allocations.
 
 ### Simple String Case Insensitive
 
-For these benchmarks the 100th word in the word list was arbitrarily as the source word to
-which all words are case insensitively compared.  As there are no globs in the source word the
-Glob library will use the `EqualToEngine`.  This is then compared against a simple 
+For these benchmarks the 100th word (arbitrarily selected) in the word list was is used as the source 
+word to which all words are case insensitively compared.  As there are no globs in the source word the
+Glob library will optimize to use the `EqualToEngine`.  This is then compared against a simple 
 `strings.EqualFold` which is a string case insensitive check. 
 
 ```
