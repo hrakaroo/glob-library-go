@@ -7,8 +7,8 @@ Glob style pattern matcher for strings in Go.
 Port of the https://github.com/hrakaroo/glob-library-java library
 to Go.  All code (including tests) have been pulled over and converted. 
 Everything compiles and all tests pass. Main benchmark for GlobEngine is is done.
-Still have a couple of additional benchmarks to run before calling it officially 
-done, but it's pretty close.
+I may add a few more benchmark tests, but for now I'm going to call this done
+and cut a 1.0 release.
 
 ### Related work
 
@@ -42,7 +42,7 @@ Added some compile option tests and the library is now at 100% code test coverag
 
 To use it add
 
-`require github.com/hrakaroo/glob-library-go v0.2.1-beta`
+`require github.com/hrakaroo/glob-library-go v1.0.0`
 
 in your `go.mod` file and then import the library in your code.  
 For my simple test this worked pretty well:
@@ -61,36 +61,71 @@ func main() {
 }
 ```
 
-### v0.1.0-alpha
+### v1.0.0
 
-First tagged version of this library.
+Added another benchmark to test the `EqualToEngine` execution speed against 
+`strings.EqualFold`.
 
 ### v0.2.1-beta
 
 Fixed the alloc issue with this version.  I may want to add a couple more 
 benchmark test, but this is pretty close to being ready for production.
 
+### v0.1.0-alpha
+
+First tagged version of this library.
+
 ## Performance
+
+The `globBenchmark_test.go` file has all of the benchmark tests.  (Eventually I may split the 
+benchmarks out into their own files, but for now they are all in one file.)  
+Fair warning that I have not spent a significant amount of time on this so I may not have 
+construsted the benchmarks entirely in idiomatic Go, but they are running and do seem to be 
+giving useful results.  All feedback or suggestions are appreciated.
+
+
+All benchmarks were run with
+```
+> go test -bench . -benchmem
+```
+and all produced the following header
+```
+goos: darwin
+goarch: amd64
+pkg: github.com/hrakaroo/glob-library-go
+cpu: Intel(R) Core(TM) i7-7660U CPU @ 2.50GHz
+```
+
+### Glob vs Regex Benchmark
 
 For both the globWords and globLogLines benchmarks the glob pattern has been written 
 specifically to prevent the Glob library from using an optimization.
 
 ```
-> go test -bench . -benchmem
-goos: darwin
-goarch: amd64
-pkg: github.com/hrakaroo/glob-library-go
-cpu: Intel(R) Core(TM) i7-7660U CPU @ 2.50GHz
 BenchmarkGlobWords-4                	      43	  28000556 ns/op	     528 B/op	      26 allocs/op
 BenchmarkGreedyRegexWords-4         	       7	 168131805 ns/op	   14853 B/op	      92 allocs/op
 BenchmarkNonGreedyRegexWords-4      	       6	 176012549 ns/op	    9574 B/op	      92 allocs/op
 BenchmarkGlobLogLines-4             	      21	  54344059 ns/op	     528 B/op	      26 allocs/op
 BenchmarkGreedyRegexLogLines-4      	       4	 297334020 ns/op	  108286 B/op	      95 allocs/op
 BenchmarkNonGreedyRegexLogLines-4   	       4	 304755895 ns/op	    9618 B/op	      92 allocs/op
-PASS
-ok  	github.com/hrakaroo/glob-library-go	9.912s
 ```
 
-I have not spent a huge amount of time on this so I may not be running the benchmark entirely correct.
-That said, for both `words` and `logLines` the glob library is considerably faster than both the greedy 
-and non greedy regex runs and have the fewest number of allocations.
+For both `words` and `logLines` the glob library is considerably faster than both 
+the greedy and non greedy regex runs and have the fewest number of allocations.
+
+### Simple String Case Insensitive
+
+For these benchmarks the 100th word in the word list was arbitrarily as the source word to
+which all words are case insensitively compared.  As there are no globs in the source word the
+Glob library will use the `EqualToEngine`.  This is then compared against a simple 
+`strings.EqualFold` which is a string case insensitive check. 
+
+```
+BenchmarkGlogEqWords-4              	      70	  15120213 ns/op	       3 B/op	       0 allocs/op
+BenchmarkStringEqWords-4              	      99	  11861602 ns/op	       0 B/op	       0 allocs/op
+```
+
+As expected, the Glob library with the `EqualToEngine` is almost 30% faster than a call to strings.EqualFold but
+uses a bit more memory.
+
+

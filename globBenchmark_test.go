@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -31,6 +32,45 @@ var logLines []string
 func init() {
 	words = readBenchmarkFile("words")
 	logLines = readBenchmarkFile("logLines")
+}
+
+func BenchmarkGlogEqWords(b *testing.B) {
+
+	word := words[100]
+	m, err := Compile(word, WithCaseInsensitive(true))
+	if err != nil {
+		panic(err)
+	}
+
+	// Run the test
+	for n := 0; n < b.N; n++ {
+		var count int
+		for _, w := range words {
+			if m.Matches(w) {
+				count += 1
+			}
+		}
+		if count != 1 {
+			b.Error("Failed to find the match")
+		}
+	}
+}
+
+func BenchmarkStringEqWords(b *testing.B) {
+	word := words[100]
+
+	// Run the test
+	for n := 0; n < b.N; n++ {
+		var count int
+		for _, w := range words {
+			if strings.EqualFold(word, w) {
+				count += 1
+			}
+		}
+		if count != 1 {
+			b.Error("Failed to find the match")
+		}
+	}
 }
 
 func BenchmarkGlobWords(b *testing.B) {
