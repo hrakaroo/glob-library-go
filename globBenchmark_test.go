@@ -34,7 +34,7 @@ func init() {
 	logLines = readBenchmarkFile("logLines")
 }
 
-func BenchmarkGlogEqWords(b *testing.B) {
+func BenchmarkGlobEqWords(b *testing.B) {
 
 	word := words[100]
 	m, err := Compile(word, WithCaseInsensitive(true))
