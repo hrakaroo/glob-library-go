@@ -185,9 +185,10 @@ type globEngine struct {
 func (e *globEngine) Matches(str string) bool {
 
 	// We use a stack instead of doing recursion.
-	//  We could move this stack declaration to a class field and doing so gains us about a 5% speed
-	//  improvement.  However, it would also remove the thread safety of this class so for the time
-	//  being I'm going to leave it here.
+	// We could move this stack declaration to a struct field for potential performance gains,
+	// but that would make individual engine instances not thread-safe for concurrent access.
+	// The current approach maintains thread safety: different instances can be used concurrently,
+	// and the same instance can be used sequentially without issues.
 	stack := make([]int, startingStackSize)
 	stackIndex := 0
 
